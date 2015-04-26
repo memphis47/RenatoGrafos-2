@@ -1,0 +1,17 @@
+strict digraph cidades{
+	rankdir=LR;
+    concentrate=true;
+    node [shape=box];
+	"BARREIRAS" -> "RIO BRANCO" [peso=3759]
+	"RIO BRANCO" -> "RIO BRANCO" [peso=0]
+    "BARREIRAS" -> "PORTO VELHO" [peso=3759]
+    "PORTO VELHO" -> "VITÓRIA" [peso=3575]
+    "VITÓRIA" -> "CAMPINA GRANDE" [peso=3575]
+    "CAMPINA GRANDE" -> "CAMPO GRANDE" [peso=3285]
+    "CAMPO GRANDE" -> "PRES. PRUDENTE" [peso=3285]
+    "PRES. PRUDENTE" -> "RIO DE JANEIRO" [peso=1055]
+    "RIO DE JANEIRO" -> "GOIÂNIA" [peso=1055]
+	"GOIÂNIA" -> "JOINVILLE" [peso=1323]
+	"JOINVILLE" -> "BARREIRAS" [peso=1323]
+
+}

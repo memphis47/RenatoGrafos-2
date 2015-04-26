@@ -1,0 +1,11 @@
+strict graph cidades{
+	"a" -- "c"
+	"a" -- "d"
+	"c" -- "b" 
+	"d" -- "b"
+    "d" -- "e"  
+    "e" -- "h"
+    "h" -- "i"
+    "i" -- "f"
+    "f" -- "g"
+}

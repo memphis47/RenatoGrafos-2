@@ -71,6 +71,7 @@ int buscaVertice(char * nome,grafo graf){
 static void guarda_arestas(Agraph_t *g, Agnode_t *v,  grafo graf, int i) {
 	int j=0;
 	double pes=0.0;
+	printf("Vertice:%s\nArestas:\n", graf->vertices[i].nome);
 	for (Agedge_t *a=agfstedge(g,v); a; a=agnxtedge(g,a,v)){
 		char *peso = agget(a, (char *)"peso");
 		if(peso!= NULL)
@@ -78,22 +79,27 @@ static void guarda_arestas(Agraph_t *g, Agnode_t *v,  grafo graf, int i) {
 
   		graf->vertices[i].arestas[j].peso=pes;
   		// verifica se o tail dessa aresta nao eh o vertice atual, se não for ele usa o tail para dizer qual eh é o vertice de ligacao, se não usa o head
-  		if(strcmp(agnameof(agtail(a)),agnameof(v)) != 0){ 
-
-  			int tam= (int) strlen(agnameof(agtail(a)));
-  			graf->vertices[i].arestas[j].verticeLigado=(char *) malloc(sizeof(char)*tam);
-  			graf->vertices[i].arestas[j].verticeLigado=agnameof(agtail(a));
-  			
-  		}
-  		else{
-  			int tam=(int) strlen(agnameof(agtail(a)));
-  			graf->vertices[i].arestas[j].verticeLigado=(char *) malloc(sizeof(char)*tam);
-  			graf->vertices[i].arestas[j].verticeLigado=agnameof(aghead(a));
-  			
-  		}
   		
-  		j++;
+	  		if(strcmp(agnameof(agtail(a)),agnameof(v)) != 0){ 
+	  			if(!graf->direcionado){
+		  			int tam= (int) strlen(agnameof(agtail(a)));
+		  			graf->vertices[i].arestas[j].verticeLigado=(char *) malloc(sizeof(char)*tam);
+		  			graf->vertices[i].arestas[j].verticeLigado=agnameof(agtail(a));
+		  			printf("Aresta Tail: %s\n", graf->vertices[i].arestas[j].verticeLigado);
+		  			j++;
+	  			}
+	  		}
+	  		else{
+	  			int tam=(int) strlen(agnameof(aghead(a)));
+	  			graf->vertices[i].arestas[j].verticeLigado=(char *) malloc(sizeof(char)*tam);
+	  			graf->vertices[i].arestas[j].verticeLigado=agnameof(aghead(a));
+	  			printf("Aresta Head: %s\n", graf->vertices[i].arestas[j].verticeLigado);
+	  			j++;
+	  			
+	  		}
+  		
   	}
+  	printf("------------\n\n\n\n\n\n");
   	graf->vertices[i].n_arestas_vertice=j;
 }
 
@@ -159,10 +165,7 @@ static void createMatrix(grafo graf){
 			for ( k = 0; k < graf->vertices[i].n_arestas_vertice; ++k)
 			{
 				idx=graf->vertices[i].arestas[k].index;
-				if(graf->vertices[i].arestas[k].peso > 0)
-					graf->matrixAdj[i][idx]=graf->vertices[i].arestas[k].peso;
-				else
-					graf->matrixAdj[i][idx]=1;
+				graf->matrixAdj[i][idx]=1;
 			}
 		}
 		
@@ -394,10 +397,24 @@ long int diametro(grafo g){
 			if(pathSize[i][j]>=1){
 				for (int k= 0; k < g->n_vertices; ++k)
 				{
-					if(pathSize[j][k]>=1)
+					if(pathSize[j][k]>=1){
 						count=pathSize[j][k]+pathSize[i][j];
-					if(pathSize[i][k]>count || pathSize[i][k]==0)
-						pathSize[i][j]=count;
+						if(i!=k){
+							if(pathSize[i][k]>count || pathSize[i][k]==0 && i!=k){
+									pathSize[i][k]=count;
+							}
+						}
+						// if(k < j){
+						// 	if(pathSize[i][j-k]>count || pathSize[i][j-k]==0 && i!=k){
+						// 		pathSize[i][j-k]=count;
+						// 	}
+						// }
+						// else if ( k > j ){
+						// 	if(pathSize[i][k]>count || pathSize[i][k]==0 && i!=k){
+						// 		pathSize[i][k]=count;
+						// 	}
+						// }
+					}
 				}
 			}
 		}

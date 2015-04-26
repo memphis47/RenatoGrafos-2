@@ -303,17 +303,17 @@ grafo escreve_grafo(FILE *output, grafo g) {
 	return g;
 }
 
-int ** allocatePathMatrix(int **pathSize,int n){
+long int ** allocatePathMatrix(long int **pathSize,int n){
   /* aloca as linhas da matriz */
 	int i;
-    pathSize = (int **) calloc (n, sizeof(int *));
+    pathSize = (long int **) calloc (n, sizeof(long int *));
     if (pathSize == NULL) {
       printf ("** Erro: Memoria Insuficiente **");
       return;
     }
     /* aloca as colunas da matriz */
     for ( i = 0; i < n; i++ ) {
-      pathSize[i] = (int*) calloc (n, sizeof(int));
+      pathSize[i] = (long int*) calloc (n, sizeof(long int));
       if (pathSize[i] == NULL) {
         printf ("** Erro: Memoria Insuficiente **");
         return;
@@ -321,22 +321,41 @@ int ** allocatePathMatrix(int **pathSize,int n){
     }
 }
 
-static void copyMatrix(int **pathSize,grafo g){
-	for(i=0;i < g->n_vertices;i++){
-		vetPath[i]=0;
-		for (j= 0; j < g->n_vertices; j++) // pega os caminhos 1 do grafo
+static void copyMatrix(long int **pathSize,grafo g){
+	for(int i=0;i < g->n_vertices;i++){
+		for (int j= 0; j < g->n_vertices; j++) // pega os caminhos 1 do grafo
 		{
 			pathSize[i][j]=g->matrixAdj[i][j];
 		}
 	}
 }
 
-static void findSmallPath(int **pathSize){
-	for(i=0;i < g->n_vertices;i++){
-		vetPath[i]=0;
-		for (j= 0; j < g->n_vertices; j++) // pega os caminhos 1 do grafo
+static void findSmallPath(long int **pathSize,int n){
+	int count;
+	for(int i=0;i < n;i++){
+		for (int j= 0; j < n; j++) // pega os caminhos 1 do grafo
 		{
-			pathSize[i][j]=g->matrixAdj[i][j];
+			if(pathSize[i][j]>=1){
+				for (int k= 0; k < n; ++k)
+				{
+					if(pathSize[j][k]>=1)
+						count=pathSize[j][k]+pathSize[i][j];
+					if(pathSize[i][j]>count || pathSize[i][j]==0)
+						pathSize[i][j]=count;
+				}
+			}
+		}
+	}
+}
+
+long int findLongestPath(long int **pathSize,int n){
+	long int big=0;
+	for(int i=0;i < n;i++){
+		for (int j= 0; j < n; j++) // pega os caminhos 1 do grafo
+		{
+			if(pathSize[i][j]>big){
+				big=pathSize[i][j];
+			}
 		}
 	}
 }
@@ -345,29 +364,69 @@ long int diametro(grafo g){
 	int i,j,count,firstOne,pathKey;
 	int *vetPath=(int *) calloc (g->n_vertices,sizeof(int));
 	int *cantDo=(int *) calloc (g->n_vertices,sizeof(int));
-	int **pathSize;
-	pathSize=allocatePathMatrix(pathSize,g->n_vertices);
-	count=1;
-	firstOne=0;
-	copyMatrix(pathSize,g);
-	findSmallPath(pathSize);
-	for(i=0;i < g->n_vertices;i++){
-		vetPath[i]=0;
-		for (j= 0; j < g->n_vertices; j++) // pega os caminhos 1 do grafo
-		{
-			if(g->matrixAdj[i][j]==1)
-				vetPath[j]=1;
-		}
-		for (int k = 0; k < g->n_vertices; k++)
-		{
-			if(vetPath[k]==1 && !firstOne){
-				firstOne=1;
-				pathKey=k;
-			}
+	long int **pathSize;
 
-		}
 
+    pathSize = (long int **) calloc (g->n_vertices, sizeof(long int *));
+    if (pathSize == NULL) {
+      printf ("** Erro: Memoria Insuficiente **");
+      return;
+    }
+    /* aloca as colunas da matriz */
+    for ( i = 0; i < g->n_vertices; i++ ) {
+      pathSize[i] = (long int*) calloc (g->n_vertices, sizeof(long int));
+      if (pathSize[i] == NULL) {
+        printf ("** Erro: Memoria Insuficiente **");
+        return;
+      }
+    }
+
+	for( i=0;i < g->n_vertices;i++){
+		for ( j= 0; j < g->n_vertices; j++) // pega os caminhos 1 do grafo
+		{
+			pathSize[i][j]=g->matrixAdj[i][j];
+		}
 	}
+
+	for( i=0;i < g->n_vertices;i++){
+		for ( j= 0; j < g->n_vertices; j++) // acha os caminhos
+		{
+			if(pathSize[i][j]>=1){
+				for (int k= 0; k < g->n_vertices; ++k)
+				{
+					if(pathSize[j][k]>=1)
+						count=pathSize[j][k]+pathSize[i][j];
+					if(pathSize[i][k]>count || pathSize[i][k]==0)
+						pathSize[i][j]=count;
+				}
+			}
+		}
+	}
+
+	printf("\n     ");
+	for( i=0;i  < g->n_vertices;i++){
+		printf("%s||", g->vertices[i].nome);
+	}
+	printf("\n");
+	for( i=0;i < g->n_vertices;i++){
+	  printf("%s  ||", g->vertices[i].nome);
+	  for( j=0;j < g->n_vertices;j++){
+	  	printf("%ld||", pathSize[i][j]);
+	  }
+	  printf("\n");
+	}
+
+	long int big=0;
+	for( i=0;i < g->n_vertices;i++){
+		for ( j= 0; j < g->n_vertices; j++) // pega os caminhos 1 do grafo
+		{
+			if(pathSize[i][j]>big){
+				big=pathSize[i][j];
+			}
+		}
+	}
+
+	return big;
 }
 
 int main(int argc, char *argv[]) 
@@ -403,6 +462,7 @@ int main(int argc, char *argv[])
 	  printf("\n");
 	}
 	grafs->conexo=conexo(grafs);
+	printf("\ndiametro=%ld\n",diametro(grafs));
 	if(grafs->conexo)
 		printf("Grafo Conexo\n");
 	else

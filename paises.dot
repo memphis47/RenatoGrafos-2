@@ -80,7 +80,7 @@ strict graph "mapa-mundi" {
     Botswana -- "South Africa"
     Botswana -- Zimbabwe
     Brazil -- Colombia
-    Brazil -- France
+    Brazil -- "French Guyana"
     Brazil -- Guyana
     Brazil -- Paraguay
     Brazil -- Peru
@@ -189,7 +189,7 @@ strict graph "mapa-mundi" {
     France -- Luxembourg
     France -- Monaco
     France -- Spain
-    France -- Suriname
+    "French Guyana" -- Suriname
     France -- Switzerland
     Gabon -- "Republic of the Congo"
     "Gaza Strip" -- Israel
